@@ -1,6 +1,6 @@
 {
   "preset": "ts-jest",
   "testEnvironment": "node",
-  "roots": ["<rootDir>/test"],
+  "roots": ["<rootDir>/src", "<rootDir>/test"],
   "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"]
 }

@@ -2,14 +2,14 @@ import { AiraloWrapper } from "../src/services/airaloService";
 import { MockAiraloWrapper } from "./mock/mockAiraloWrapper";
 import { config } from "dotenv";
 
-config()
+config();
 
 describe("AiraloService", () => {
   let airaloWrapper: AiraloWrapper;
 
   beforeEach(async () => {
     airaloWrapper = new AiraloWrapper(null, null);
-    await airaloWrapper.initialize()
+    await airaloWrapper.initialize();
   }, 10000); // Increased timeout to 10 seconds for beforeEach
 
   // This test now acts as an integration test, calling the actual service
@@ -23,24 +23,21 @@ describe("AiraloService", () => {
     // Further assertions could be added here to check the structure of the packages
     // if the API response structure is known and consistent.
     // const firstPackage = packages[0] as AiraloPackage;
-    const firstPackage = packages[0]
-    console.log(firstPackage)
+    const firstPackage = packages[0];
+    console.log(firstPackage);
   });
-
-  
 
   it("should call getSIMTopups successfully", async () => {
     const iccid = "89852351124620400870";
     const packages = await airaloWrapper.getSIMTopups(iccid);
-
   });
 
-  // 
-  it("sim-details", async() => {
+  //
+  it("sim-details", async () => {
     const iccid = "89852351124730070654";
     const details = await airaloWrapper.getSIMDetails(iccid);
-    console.log(details)
-  })
+    console.log(details);
+  });
 
   // it("should call createTopupOrder successfully", async () => {
   //   const iccid = "89852351124620400870";

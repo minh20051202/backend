@@ -1,6 +1,6 @@
-import axios from 'axios';
+import axios from "axios";
 
-const DVPN_BASE_URL = 'https://api.dvpnsdk.com';
+const DVPN_BASE_URL = "https://api.dvpnsdk.com";
 
 export class DVPNClient {
   private dvpnApiKey: string;
@@ -9,7 +9,7 @@ export class DVPNClient {
     const dvpnApiKey = process.env.DVPN_API_KEY;
 
     if (!dvpnApiKey) {
-      throw new Error('DVPN_API_KEY environment variable is not set.');
+      throw new Error("DVPN_API_KEY environment variable is not set.");
     }
 
     this.dvpnApiKey = dvpnApiKey;
@@ -27,7 +27,7 @@ export class DVPNClient {
 
   async createDevice(platform?: string) {
     const res = await axios.post(`${DVPN_BASE_URL}/device`, {
-      platform: !!platform ? platform : '',
+      platform: !!platform ? platform : "",
       app_token: this.dvpnApiKey,
     });
     return res.data;
@@ -35,7 +35,7 @@ export class DVPNClient {
 
   async getCountries(deviceToken: string) {
     const res = await axios.get(`${DVPN_BASE_URL}/country?filter=WIREGUARD`, {
-      headers: { 'x-device-token': deviceToken },
+      headers: { "x-device-token": deviceToken },
     });
     return res.data;
   }
@@ -43,10 +43,10 @@ export class DVPNClient {
   async getCities(deviceToken: string, countryId: string) {
     const res = await axios.get(`${DVPN_BASE_URL}/country/${countryId}/city`, {
       headers: {
-        'x-device-token': deviceToken,
+        "x-device-token": deviceToken,
       },
       params: {
-        filter: 'WIREGUARD',
+        filter: "WIREGUARD",
       },
     });
 
@@ -54,16 +54,23 @@ export class DVPNClient {
   }
 
   async getServers(deviceToken: string, cityId: string) {
-    const res = await axios.get(`${DVPN_BASE_URL}/city/${cityId}/server?filter=WIREGUARD`, {
-      headers: { 'x-device-token': deviceToken },
-    });
+    const res = await axios.get(
+      `${DVPN_BASE_URL}/city/${cityId}/server?filter=WIREGUARD`,
+      {
+        headers: { "x-device-token": deviceToken },
+      }
+    );
     return res.data;
   }
 
   async createServerCredentials(deviceToken: string, serverId: string) {
-    const res = await axios.post(`${DVPN_BASE_URL}/server/${serverId}/credentials`, {}, {
-      headers: { 'x-device-token': deviceToken },
-    });
+    const res = await axios.post(
+      `${DVPN_BASE_URL}/server/${serverId}/credentials`,
+      {},
+      {
+        headers: { "x-device-token": deviceToken },
+      }
+    );
     return res.data;
   }
 }

@@ -26,7 +26,6 @@ describe("DVPNClient", () => {
     process.env.DVPN_API_KEY = FAKE_API_KEY;
   });
 
-  // --- 1. CONSTRUCTOR TESTS ---
   describe("constructor", () => {
     it("should initialize successfully when DVPN_API_KEY is set", () => {
       expect(() => new DVPNClient()).not.toThrow();
@@ -40,7 +39,6 @@ describe("DVPNClient", () => {
     });
   });
 
-  // --- 2. API METHOD TESTS ---
   describe("API methods", () => {
     let dVPNClient: DVPNClient;
     beforeEach(() => {

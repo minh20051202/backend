@@ -1,5 +1,5 @@
-import { AiraloWrapper } from "../src/services/airaloService";
-import { MockAiraloWrapper } from "./mock/mockAiraloWrapper";
+import { AiraloWrapper } from "../../src/services/airaloService";
+import { MockAiraloWrapper } from "../mock/mockAiraloWrapper";
 import { config } from "dotenv";
 
 config();

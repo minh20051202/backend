@@ -5,8 +5,8 @@ import { GCloudLogger, initializeFirebase } from "./helper";
 import { OrderHandler } from "./order-handler";
 import { AiraloSIMTopup, AiraloWrapper } from "./services/airaloService";
 import { DVPNClient } from "./clients/dVPN.client";
-import { VPNService } from "./services/vpn.service";
-import { VPNController } from "./controllers/vpn.controller";
+import { DVPNService } from "./services/dVPN.service";
+import { DVPNController } from "./controllers/dVPN.controller";
 import { SolanaService } from "./services/solanaService";
 import { TopupHandler } from "./topup-handler";
 
@@ -26,8 +26,8 @@ interface PaymentProfile {
 let solanaService: SolanaService;
 let airaloWrapper: AiraloWrapper;
 let dVPNClient: DVPNClient;
-let vpnService: VPNService;
-let vpnController: VPNController;
+let dVPNService: DVPNService;
+let dVPNController: DVPNController;
 
 async function main() {
   db = await initializeFirebase();
@@ -39,8 +39,8 @@ async function main() {
   await airaloWrapper.initialize();
 
   const dVPNClient = new DVPNClient();
-  const vpnService = new VPNService(dVPNClient);
-  const vpnController = new VPNController(vpnService);
+  const dVPNService = new DVPNService(dVPNClient);
+  const dVPNController = new DVPNController(dVPNService);
 
   const orderHandler = new OrderHandler(
     db,
@@ -171,56 +171,9 @@ async function main() {
       res.status(500).json({ error: "Failed to get cities" });
     }
   });
-
-  // Get all config to active VPN
-  app.post("/vpn/active", async (req, res) => {
-    try {
-      // create device
-      const deviceInfo = await dVPNService.createDevice();
-
-      // find countries
-      const deviceToken = deviceInfo.data.token;
-      const countries = await dVPNService.getCountries(deviceToken);
-      if (countries.data.length === 0)
-        return res.status(404).json({ error: "No countries found" });
-
-      // find cities
-      const randomCountry =
-        countries.data[Math.floor(Math.random() * countries.data.length)];
-      const cities = await dVPNService.getCities(deviceToken, randomCountry.id);
-      if (cities.data.length === 0)
-        return res.status(404).json({ error: "No cities found" });
-
-      // find servers
-      const randomCity =
-        cities.data[Math.floor(Math.random() * cities.data.length)];
-      const servers = await dVPNService.getServers(deviceToken, randomCity.id);
-      if (servers.data.length === 0)
-        return res.status(404).json({ error: "No servers found" });
-
-      const randomServer =
-        servers.data[Math.floor(Math.random() * servers.data.length)];
-      const credentials = await dVPNService.createServerCredentials(
-        deviceToken,
-        randomServer.id
-      );
-
-      const configText = dVPNService.buildWireGuardConf(credentials.data);
-      return res.json({
-        deviceToken: deviceToken,
-        config: configText,
-        raw: credentials,
-        city: randomCity.name,
-        server: randomServer.name,
-      });
-    } catch (err) {
-      console.error(err?.response?.data || err);
-      res.status(500).json({ error: "Failed to get VPN configuration" });
-    }
-  });
+  app.post("/vpn/active", dVPNController.getActiveDVPN);
 
   // === PAYMENT PROFILE HANDLER ===
-
   // User must have payment profile as unique identifier to manage payment and esim subcription
   app.post("/create-payment-profile", async (req: Request, res: Response) => {
     try {

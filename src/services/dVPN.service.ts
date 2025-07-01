@@ -9,7 +9,7 @@ class HttpError extends Error {
   }
 }
 
-export class VPNService {
+export class DVPNService {
   private dVPNClient: DVPNClient;
 
   // Inject the low-level dVPNClient as a dependency
@@ -17,7 +17,7 @@ export class VPNService {
     this.dVPNClient = dVPNClient;
   }
 
-  public async getActiveVPNConfig() {
+  public async getActiveDVPNConfig() {
     // Step 1: Create device
     const deviceInfo = await this.dVPNClient.createDevice();
     const deviceToken = deviceInfo.data.token;
@@ -29,36 +29,43 @@ export class VPNService {
     }
 
     // Step 3: Find cities
-    const firstCountry = countries.data[0];
+    const randomCountry =
+      countries.data[Math.floor(Math.random() * countries.data.length)];
     const cities = await this.dVPNClient.getCities(
-      firstCountry.id,
-      deviceToken
+      deviceToken,
+      randomCountry.id
     );
     if (cities.data.length === 0) {
       throw new HttpError("No cities found", 404);
     }
 
     // Step 4: Find servers
-    const firstCity = cities.data[0];
-    const servers = await this.dVPNClient.getServers(deviceToken, firstCity.id);
+    const randomCity =
+      cities.data[Math.floor(Math.random() * cities.data.length)];
+    const servers = await this.dVPNClient.getServers(
+      deviceToken,
+      randomCity.id
+    );
     if (servers.data.length === 0) {
       throw new HttpError("No servers found", 404);
     }
 
     // Step 5: Get credentials and build config
-    const firstServer = servers.data[0];
+    const randomServer =
+      servers.data[Math.floor(Math.random() * servers.data.length)];
     const credentials = await this.dVPNClient.createServerCredentials(
       deviceToken,
-      firstServer.id
+      randomServer.id
     );
     const configText = this.buildWireGuardConf(credentials.data);
 
     // Final Step: Return a clean data object
     return {
+      deviceToken: deviceToken,
       config: configText,
       raw: credentials,
-      city: firstCity.name,
-      server: firstServer.name,
+      city: randomCity.name,
+      server: randomServer.name,
     };
   }
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 
-import { SolanaService } from '../src/services/solanaService';
+import { SolanaService } from '../../src/services/solanaService';
 import dotenv from 'dotenv';
 
 dotenv.config();

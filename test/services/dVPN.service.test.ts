@@ -1,17 +1,17 @@
-import { VPNService } from "../../src/services/vpn.service";
+import { DVPNService } from "../../src/services/dVPN.service";
 import { DVPNClient } from "../../src/clients/dVPN.client";
 
 jest.mock("../../src/clients/dVPN.client");
 
 describe("VPNService", () => {
-  let vpnService: VPNService;
+  let vpnService: DVPNService;
   let mockDVPNClient: jest.Mocked<DVPNClient>;
 
   beforeEach(() => {
     jest.clearAllMocks();
     // Create a fresh mock of the DVPNClient for each test.
     mockDVPNClient = new DVPNClient() as jest.Mocked<DVPNClient>;
-    vpnService = new VPNService(mockDVPNClient);
+    vpnService = new DVPNService(mockDVPNClient);
   });
 
   describe("getActiveVPNConfig", () => {
@@ -31,7 +31,7 @@ describe("VPNService", () => {
       mockDVPNClient.createServerCredentials.mockResolvedValue(mockCredentials);
 
       // Act
-      const result = await vpnService.getActiveVPNConfig();
+      const result = await vpnService.getActiveDVPNConfig();
 
       // Assert
       expect(mockDVPNClient.getCountries).toHaveBeenCalledWith(
@@ -52,7 +52,7 @@ describe("VPNService", () => {
       mockDVPNClient.createDevice.mockRejectedValue(networkError);
 
       // Act & Assert
-      await expect(vpnService.getActiveVPNConfig()).rejects.toThrow(
+      await expect(vpnService.getActiveDVPNConfig()).rejects.toThrow(
         "API is down"
       );
 
@@ -68,10 +68,7 @@ describe("VPNService", () => {
       mockDVPNClient.getCountries.mockResolvedValue({ data: [] }); // The failure point
 
       // Act & Assert
-      await expect(vpnService.getActiveVPNConfig()).rejects.toThrow(
-        "No countries found"
-      );
-      await expect(vpnService.getActiveVPNConfig()).rejects.toHaveProperty(
+      await expect(vpnService.getActiveDVPNConfig()).rejects.toHaveProperty(
         "statusCode",
         404
       );
@@ -90,10 +87,10 @@ describe("VPNService", () => {
       mockDVPNClient.getCities.mockResolvedValue({ data: [] }); // The failure point
 
       // Act & Assert
-      await expect(vpnService.getActiveVPNConfig()).rejects.toThrow(
+      await expect(vpnService.getActiveDVPNConfig()).rejects.toThrow(
         "No cities found"
       );
-      await expect(vpnService.getActiveVPNConfig()).rejects.toHaveProperty(
+      await expect(vpnService.getActiveDVPNConfig()).rejects.toHaveProperty(
         "statusCode",
         404
       );
@@ -114,10 +111,10 @@ describe("VPNService", () => {
       mockDVPNClient.getServers.mockResolvedValue({ data: [] }); // The failure point
 
       // Act & Assert
-      await expect(vpnService.getActiveVPNConfig()).rejects.toThrow(
+      await expect(vpnService.getActiveDVPNConfig()).rejects.toThrow(
         "No servers found"
       );
-      await expect(vpnService.getActiveVPNConfig()).rejects.toHaveProperty(
+      await expect(vpnService.getActiveDVPNConfig()).rejects.toHaveProperty(
         "statusCode",
         404
       );

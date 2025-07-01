@@ -1,23 +1,23 @@
 import { Request, Response } from "express";
-import { VPNController } from "../../src/controllers/vpn.controller";
-import { VPNService } from "../../src/services/vpn.service";
+import { DVPNController } from "../../src/controllers/dVPN.controller";
+import { DVPNService } from "../../src/services/dVPN.service";
 
-jest.mock("../../src/services/vpn.service");
+jest.mock("../../src/services/dVPN.service");
 
-describe("VPNController", () => {
-  let vpnController: VPNController;
-  let mockVPNService: jest.Mocked<VPNService>;
+describe("DVPNController", () => {
+  let dVPNController: DVPNController;
+  let mockDVPNService: jest.Mocked<DVPNService>;
   let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
   let mockNext: jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    // Create a fresh mock of the VPNService for each test.
-    mockVPNService = new VPNService({} as any) as jest.Mocked<VPNService>;
+    // Create a fresh mock of the DVPNService for each test.
+    mockDVPNService = new DVPNService({} as any) as jest.Mocked<DVPNService>;
 
     // Inject the mock service into controller.
-    vpnController = new VPNController(mockVPNService);
+    dVPNController = new DVPNController(mockDVPNService);
 
     // Create fresh mock Express objects for each test.
     mockRequest = {};
@@ -28,29 +28,29 @@ describe("VPNController", () => {
     mockNext = jest.fn();
   });
 
-  describe("getActiveVPN", () => {
+  describe("getActiveDVPN", () => {
     // --- Test Case H1: The Happy Path ---
     it("should call the service and return a 200 status with the config data", async () => {
       // Arrange
-      const mockVPNConfig = {
+      const mockDVPNConfig = {
         config: "...",
         raw: "...",
         city: "Test City",
         server: "Test Server",
       };
-      mockVPNService.getActiveVPNConfig.mockResolvedValue(mockVPNConfig);
+      mockDVPNService.getActiveDVPNConfig.mockResolvedValue(mockDVPNConfig);
 
       // Act
-      await vpnController.getActiveVPN(
+      await dVPNController.getActiveDVPN(
         mockRequest as Request,
         mockResponse as Response
       );
 
       // Assert
-      expect(mockVPNService.getActiveVPNConfig).toHaveBeenCalledTimes(1);
+      expect(mockDVPNService.getActiveDVPNConfig).toHaveBeenCalledTimes(1);
       expect(mockResponse.status).not.toHaveBeenCalled();
       expect(mockResponse.json).toHaveBeenCalledTimes(1);
-      expect(mockResponse.json).toHaveBeenCalledWith(mockVPNConfig);
+      expect(mockResponse.json).toHaveBeenCalledWith(mockDVPNConfig);
     });
 
     // --- Test Case S1: Handled "Sad Path" (404 Not Found) ---
@@ -58,16 +58,16 @@ describe("VPNController", () => {
       // Arrange
       const notFoundError = new Error("No countries found");
       (notFoundError as any).statusCode = 404;
-      mockVPNService.getActiveVPNConfig.mockRejectedValue(notFoundError);
+      mockDVPNService.getActiveDVPNConfig.mockRejectedValue(notFoundError);
 
       // Act
-      await vpnController.getActiveVPN(
+      await dVPNController.getActiveDVPN(
         mockRequest as Request,
         mockResponse as Response
       );
 
       // Assert
-      expect(mockVPNService.getActiveVPNConfig).toHaveBeenCalledTimes(1);
+      expect(mockDVPNService.getActiveDVPNConfig).toHaveBeenCalledTimes(1);
       expect(mockResponse.status).toHaveBeenCalledWith(404);
       expect(mockResponse.json).toHaveBeenCalledWith({
         error: "No countries found",
@@ -78,19 +78,19 @@ describe("VPNController", () => {
     it("should return a 500 status for unexpected, generic errors from the service", async () => {
       // Arrange
       const genericError = new Error("Database connection failed");
-      mockVPNService.getActiveVPNConfig.mockRejectedValue(genericError);
+      mockDVPNService.getActiveDVPNConfig.mockRejectedValue(genericError);
 
       // Act
-      await vpnController.getActiveVPN(
+      await dVPNController.getActiveDVPN(
         mockRequest as Request,
         mockResponse as Response
       );
 
       // Assert
-      expect(mockVPNService.getActiveVPNConfig).toHaveBeenCalledTimes(1);
+      expect(mockDVPNService.getActiveDVPNConfig).toHaveBeenCalledTimes(1);
       expect(mockResponse.status).toHaveBeenCalledWith(500);
       expect(mockResponse.json).toHaveBeenCalledWith({
-        error: "Failed to get VPN configuration",
+        error: "Failed to get DVPN configuration",
       });
     });
   });
